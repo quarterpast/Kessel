@@ -29,4 +29,10 @@ exports.empty = (str)->
 exports.regex = (r, str)-->
 	if str == //^#{r.source}//
 		Success that.0, str.slice that.0.length
-	else Failure "Expected '#r', got '#str'"
+	else Failure "Expected #r, got '#str'"
+
+exports.map = (f, p, str)--> match p str
+	| Success~is => Success (f that.token), that.rest
+	| Failure~is => that
+
+

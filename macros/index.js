@@ -9,11 +9,13 @@ macro (%) {
 	rule { $k }     => { kessel.regex($k)   }
 }
 
-operator (|) 14 left { $l, $r } => #{ kessel.dis($l, $r) }
-operator (~) 16 right { $l, $r } => #{ kessel.seq(=> $l, => $r) }
+operator (|)   14 left  { $l, $r } => #{ kessel.dis($l, $r) }
+operator (~)   16 right { $l, $r } => #{ kessel.seq(=> $l, => $r) }
+operator (^^)  12 left  { $l, $r } => #{ kessel.map($r, $l) }
+operator (^^^) 12 left  { $l, $r } => #{ kessel.map(=> $r, $l) }
 
 var atom  = %/[a-z]+/;
-var sexpr = %"(" ~ seq ~ %")" | atom;
+var sexpr = (%"(" ~ seq ~ %")" ^^ function(a) { return a[1] }) | atom;
 var seq   = sexpr ~ seq | kessel.empty;
 
 var result = sexpr("(a(aa))");
