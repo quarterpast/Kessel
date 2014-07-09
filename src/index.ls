@@ -25,3 +25,8 @@ exports.dis = (l, r, str)--> match l str
 
 exports.empty = (str)->
 	Success [], str
+
+exports.regex = (r, str)-->
+	if str == //^#{r.source}//
+		Success that.0, str.slice that.0.length
+	else Failure "Expected '#r', got '#str'"

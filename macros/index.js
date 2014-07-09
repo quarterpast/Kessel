@@ -6,12 +6,13 @@ macro (=>) {
 
 macro (%) {
 	rule { $k:lit } => { kessel.keyword($k) }
+	rule { $k }     => { kessel.regex($k)   }
 }
 
 operator (|) 14 left { $l, $r } => #{ kessel.dis($l, $r) }
 operator (~) 16 right { $l, $r } => #{ kessel.seq(=> $l, => $r) }
 
-var atom  = %"a";
+var atom  = %/[a-z]+/;
 var sexpr = %"(" ~ seq ~ %")" | atom;
 var seq   = sexpr ~ seq | kessel.empty;
 
