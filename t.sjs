@@ -1,8 +1,13 @@
 var kessel = require('./lib');
 
-var atom  = %/[a-z]+/;
-var sexpr = atom | (%"(" ~ seq ~ %")" ^^ function(a) { return a[1] });
-var seq   = sexpr ~ seq | kessel.empty;
+macro λ {
+	rule { $p:ident -> $r:expr } => {function($p) { return $r }}
+}
 
-var result = sexpr("(a (a a) (a))");
+var atom  = %/[a-z0-9\-_$]/i;
+var seq   = cexpr ~ seq | kessel.empty;
+var sexpr = atom | (%"(" ~ seq ~ %")" ^^ λ a -> a[1]);
+var cexpr = (%"{" ~ sexpr ~ atom ~ sexpr ~ %"}" ^^ λ a -> [a[2], a[1], a[3]]) | sexpr;
+
+var result = cexpr("(a {a - c} (a))");
 console.log(result.token ? JSON.stringify(result.token, null, 2) : result.message);
