@@ -21,5 +21,9 @@
   "bugs": {
     "url": "https://github.com/quarterto/Kessel/issues"
   },
-  "homepage": "https://github.com/quarterto/Kessel"
+  "homepage": "https://github.com/quarterto/Kessel",
+  "devDependencies": {
+    "LiveScript": "^1.2.0",
+    "sweet.js": "^0.7.0"
+  }
 }

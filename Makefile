@@ -1,4 +1,5 @@
-export SHELL := zsh
+export SHELL := /bin/bash
+export PATH  := $(shell npm bin):$(PATH)
 
 all: run
 
