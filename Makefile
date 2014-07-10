@@ -6,8 +6,8 @@ lib/%.js: src/%.ls
 	mkdir -p lib
 	lsc -o lib -c $<
 
-t.js: macros/index.js
-	sjs $< > $@
+%.js: %.sjs macros/index.js
+	sjs -m ./macros $< > $@
 
 run: lib/index.js t.js
 	node t.js

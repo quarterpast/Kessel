@@ -1,22 +1,19 @@
-var kessel = require('./lib');
-
 macro (=>) {
 	rule { $r:expr } => { function() { return $r } }
 }
 
 macro (%) {
-	rule { $k:lit } => { kessel.keyword($k) }
-	rule { $k }     => { kessel.regex($k)   }
+	rule { $k:lit } => { require('./lib').keyword($k) }
+	rule { $k }     => { require('./lib').regex($k)   }
 }
+export (%);
 
-operator (|)   14 left  { $l, $r } => #{ kessel.dis($l, $r) }
-operator (~)   16 right { $l, $r } => #{ kessel.seq(=> $l, => $r) }
-operator (^^)  12 left  { $l, $r } => #{ kessel.map($r, $l) }
-operator (^^^) 12 left  { $l, $r } => #{ kessel.map(=> $r, $l) }
+operator (|)   14 left  { $l, $r } => #{ require('./lib').dis($l, $r) }
+operator (~)   16 right { $l, $r } => #{ require('./lib').seq(=> $l, => $r) }
+operator (^^)  12 left  { $l, $r } => #{ require('./lib').map($r, $l) }
+operator (^^^) 12 left  { $l, $r } => #{ require('./lib').map(=> $r, $l) }
 
-var atom  = %/[a-z]+/;
-var sexpr = atom | (%"(" ~ seq ~ %")" ^^ function(a) { return a[1] });
-var seq   = sexpr ~ seq | kessel.empty;
-
-var result = sexpr("(a (a a) (a))");
-console.log(result.token ? JSON.stringify(result.token, null, 2) : result.message);
+export (|);
+export (~);
+export (^^);
+export (^^^);
