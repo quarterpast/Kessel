@@ -1,0 +1,25 @@
+{
+  "name": "kessel",
+  "version": "0.0.0",
+  "description": "less that 12 parsecs",
+  "main": "lib",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/quarterto/Kessel.git"
+  },
+  "keywords": [
+    "parsec",
+    "parser",
+    "parser",
+    "combinator"
+  ],
+  "author": "Matt Brennan <mwrbrennan@gmail.com> (http://blog.153.io/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/quarterto/Kessel/issues"
+  },
+  "homepage": "https://github.com/quarterto/Kessel"
+}
