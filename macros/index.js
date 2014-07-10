@@ -15,8 +15,8 @@ operator (^^)  12 left  { $l, $r } => #{ kessel.map($r, $l) }
 operator (^^^) 12 left  { $l, $r } => #{ kessel.map(=> $r, $l) }
 
 var atom  = %/[a-z]+/;
-var sexpr = (%"(" ~ seq ~ %")" ^^ function(a) { return a[1] }) | atom;
+var sexpr = atom | (%"(" ~ seq ~ %")" ^^ function(a) { return a[1] });
 var seq   = sexpr ~ seq | kessel.empty;
 
-var result = sexpr("(a(aa))");
+var result = sexpr("(a (a a) (a))");
 console.log(result.token ? JSON.stringify(result.token, null, 2) : result.message);

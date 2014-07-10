@@ -14,8 +14,8 @@ exports.keyword = (k, str)-->
 exports.seq = (l, r, str)--> match l! str
 	| Success~is =>
 		{token:lval, rest} = that
-		match r! rest
-		| Success~is => Success [lval] ++ that.token, that.rest
+		match r! rest.trim!
+		| Success~is => Success [lval] ++ that.token, that.rest.trim!
 		| Failure~is => that
 	| Failure~is => that
 
