@@ -142,3 +142,62 @@ describe "seq" {
 		}
 	}
 }
+
+describe "dis" {
+	describe "success or failure" {
+		it "should be success" {
+			expect(kessel.dis(=> Success(), => Failure())()).to.be.a(Success);
+		}
+
+		it "should pass along token" {
+			expect(kessel.dis(=> Success("a"), => Failure())()).to.have.property("token","a");
+		}
+
+		it "should pass along rest" {
+			expect(kessel.dis(=> Success(null, "a"), => Failure())()).to.have.property("rest","a");
+		}
+	}
+	describe "failure or success" {
+		it "should be success" {
+			expect(kessel.dis(=> Failure(), => Success())()).to.be.a(Success);
+		}
+
+		it "should pass along token" {
+			expect(kessel.dis(=> Failure(), => Success("a"))()).to.have.property("token","a");
+		}
+
+		it "should pass along rest" {
+			expect(kessel.dis(=> Failure(), => Success(null, "a"))()).to.have.property("rest","a");
+		}
+	}
+	
+	describe "failure or failure" {
+		it "should be failure" {
+			expect(kessel.dis(=> Failure(), => Failure())()).to.be.a(Failure);
+		}
+
+		it "should pass along second message" {
+			expect(kessel.dis(=> Failure("a"), => Failure("b"))()).to.have.property("message","b");
+		}
+	}
+
+	describe "success or success" {
+		it "should be success" {
+			expect(kessel.dis(=> Success(), => Success())()).to.be.a(Success);
+		}
+
+		it "should pass along first token" {
+			expect(kessel.dis(=> Success("a"), => Success("b"))()).to.have.property("token","a");
+		}
+
+		it "should pass along first rest" {
+			expect(kessel.dis(=> Success(null, "a"), => Success(null, "b"))()).to.have.property("rest","a");
+		}
+
+		it "shouldn't even bother calling the second thing" {
+			var r = =!> Success();
+			kessel.dis(=> Success(), r)();
+			expect(r).was.notCalled();
+		}
+	}
+}
