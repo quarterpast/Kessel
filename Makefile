@@ -13,4 +13,7 @@ lib/%.js: src/%.ls
 run: lib/index.js t.js
 	node t.js
 
+test: lib/index.js test.js
+	mocha test.js
+
 .PHONY: run

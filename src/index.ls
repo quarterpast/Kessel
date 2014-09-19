@@ -35,4 +35,3 @@ exports.map = (f, p, str)--> match p str
 	| Success~is => Success (f that.token), that.rest
 	| Failure~is => that
 
-
