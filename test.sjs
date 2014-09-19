@@ -104,4 +104,41 @@ describe "seq" {
 			expect(kessel.seq(=> => Success("", ""), => => Success("", "c"))()).to.have.property("rest", "c");
 		}
 	}
+
+	describe "failure followed by success" {
+		it "should be failure" {
+			expect(kessel.seq(=> => Failure(), => => Success())()).to.be.a(Failure);
+		}
+		it "should pass message along" {
+			expect(kessel.seq(=> => Failure("nope"), => => Success())()).to.have.property("message","nope");
+		}
+		it "shouldn't even bother calling the second thing" {
+			var r = =!> => Success();
+			kessel.seq(=> => Failure(), r)();
+			expect(r).was.notCalled();
+		}
+	}
+
+	describe "failure followed by failure" {
+		it "should be failure" {
+			expect(kessel.seq(=> => Failure(), => => Failure())()).to.be.a(Failure);
+		}
+		it "should pass first message along" {
+			expect(kessel.seq(=> => Failure("nope"), => => Failure("haha"))()).to.have.property("message","nope");
+		}
+		it "shouldn't even bother calling the second thing" {
+			var r = =!> => Failure();
+			kessel.seq(=> => Failure(), r)();
+			expect(r).was.notCalled();
+		}
+	}
+
+	describe "success followed by failure" {
+		it "should be failure" {
+			expect(kessel.seq(=> => Success("",""), => => Failure())()).to.be.a(Failure);
+		}
+		it "should pass message along" {
+			expect(kessel.seq(=> => Success("",""), => => Failure("nope"))()).to.have.property("message","nope");
+		}
+	}
 }
