@@ -15,9 +15,9 @@ macro (=!>) {
 }
 
 macro to_str {
-  case { _ ($toks ...) } => {
-    return [makeValue(#{ $toks ... }.map(unwrapSyntax).join(''), #{ here })];
-  }
+	case { _ ($toks ...) } => {
+		return [makeValue(#{ $toks ... }.map(unwrapSyntax).join(''), #{ here })];
+	}
 }
 let describe = macro {
 	rule { $s $body } => { describe($s, function() $body); }
@@ -186,5 +186,12 @@ describe "dis" {
 			kessel.dis(=> Success(), r)();
 			expect(r).was.notCalled();
 		}
+	}
+}
+
+describe "the whole thing" {
+	it "should support left-recursive grammars" {
+		var a = kessel.seq(=> a, => kessel.keyword("a"));
+		expect(a("a")).to.be.a(Success);
 	}
 }
