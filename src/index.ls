@@ -3,13 +3,37 @@ class Result
 class exports.Success extends Result => (@token, @rest)~>
 class exports.Failure extends Result => (@message)~>
 
-exports.keyword = (k, str)-->
-	trunc = str.slice 0 k.length
+class Token
+	@subclasses = [Token]
+	@support = (.constructor is Token)
+	@extended = -> @subclasses.push it
+	@create = ->
+		for s in @subclasses when s.support it
+			return s it
+	(tok)~> return tok
+	rest:  (str, m)-> str.substr m.length
+
+
+class StringToken extends Token
+	@support = -> typeof it is \string
+	(@tok)~>
+	match: (str)-> @tok if @tok is str.slice 0 @tok.length
+	expected: (got)-> "Expected '#{@tok}' got '#{got.slice 0 @tok.length}'"
+
+class RegexToken extends Token
+	@support = (instanceof RegExp)
+	(@tok)~>
+	match: (str)-> that.1 ? that.0 if @tok.exec str
+	expected: (got)-> "Expected '#{@tok}' got '#got'"
+
+
+exports.keyword = (key, str)-->
+	k = Token.create key
 	
-	if trunc is k
-		Success k, str.slice k.length
+	if (k.match str)?
+		Success that, k.rest str, that
 	else
-		Failure "Expected '#k' got '#trunc'"
+		Failure k.expected str
 
 exports.seq = (l, r, str)--> match l! str
 	| Success~is =>
@@ -25,11 +49,6 @@ exports.dis = (l, r, str)--> match l str
 
 exports.empty = (str)->
 	Success [], str
-
-exports.regex = (r, str)-->
-	if str == //^#{r.source}//
-		Success that.0, str.slice that.0.length
-	else Failure "Expected #r, got '#str'"
 
 exports.map = (f, p, str)--> match p str
 	| Success~is => Success (f that.token), that.rest
