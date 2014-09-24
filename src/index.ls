@@ -13,7 +13,6 @@ class Token
 	(tok)~> return tok
 	rest:  (str, m)-> str.substr m.length
 
-
 class StringToken extends Token
 	@support = -> typeof it is \string
 	(@tok)~>
@@ -25,7 +24,6 @@ class RegexToken extends Token
 	(@tok)~>
 	match: (str)-> that.1 ? that.0 if @tok.exec str
 	expected: (got)-> "Expected '#{@tok}' got '#got'"
-
 
 exports.keyword = (key, str)-->
 	k = Token.create key
