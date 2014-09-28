@@ -160,7 +160,7 @@ describe "dis" {
 	
 	describe "failure or failure" {
 		it "should be failure" {
-			expect(kessel.dis(=> Failure(""), => Failure())("")).to.be.a(Failure);
+			expect(kessel.dis(=> Failure(""), => Failure(""))("")).to.be.a(Failure);
 		}
 
 		it "should pass along second message" {

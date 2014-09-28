@@ -63,3 +63,10 @@ exports.seq = curry(function(l, r, str) {
 			return f;
 	}
 });
+
+exports.dis = curry(function(l, r, str) {
+	return match l(str) {
+		s @ Success => s,
+		Failure => r(str);
+	};
+});
