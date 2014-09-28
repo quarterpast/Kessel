@@ -26,6 +26,23 @@ var Token = {
 				return str.slice(this.tok.length);
 			}
 		},
+		RegexToken: {
+			support: function(s) {
+				return s instanceof RegExp;
+			},
+			match: function(str) {
+				var m = this.tok.exec(str);
+				if(m) {
+					return m[1] || m[0];
+				}
+			},
+			expected: function(got) {
+				return "Expected '"+this.tok+"' got '"+got+"'";
+			},
+			rest: function(str, m) {
+				return str.slice(m.length);
+			}
+		},
 	},
 
 	create: function(tok) {
