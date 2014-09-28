@@ -230,9 +230,30 @@ describe "dis" {
 	}
 }
 
+describe "map" {
+	describe "success" {
+		it "should be successful" {
+			expect(kessel.map(λ -> null, => Success())("")).to.be.a(Success);
+		}
+		it "should apply function to token" {
+			expect(kessel.map(λ[# + "world"], => Success("hello "))("")).to.have.property("token", "hello world");
+		}
+		it "should leave rest alone" {
+			expect(kessel.map(λ -> null, => Success("","rest"))("")).to.have.property("rest", "rest");
+		}
+	}
+	describe "failure" {
+		it "should fail" {
+			expect(kessel.map(λ -> null, => Failure(""))("")).to.be.a(Failure);
+		}
+	}
+}
+
 describe "the whole thing" {
 	it "should support left-recursive grammars" {
 		var a = kessel.seq(=> a, => kessel.keyword("a"));
 		expect(a("a")).to.be.a(Success);
 	}
 }
+
+
