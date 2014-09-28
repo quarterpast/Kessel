@@ -11,8 +11,9 @@ exports.Failure = Failure;
 var Token = {
 	tokens: {
 		StringToken: {
-			support: function(s) {
-				return typeof s === 'string';
+			support: function {
+				String => true,
+				* => false
 			},
 			match: function(str) {
 				if(this.tok === str.slice(0, this.tok.length)) {
@@ -27,8 +28,9 @@ var Token = {
 			}
 		},
 		RegexToken: {
-			support: function(s) {
-				return s instanceof RegExp;
+			support: function {
+				RegExp => true,
+				* => false
 			},
 			match: function(str) {
 				var m = this.tok.exec(str);
