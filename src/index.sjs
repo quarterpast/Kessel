@@ -51,3 +51,15 @@ exports.keyword = curry(function(key, str) {
 	return Failure(tok.expected(str));
 });
 
+exports.seq = curry(function(l, r, str) {
+	match l()(str) {
+		case Success{token, rest}: 
+			var ltok = token;
+			return match r()(rest) {
+				Success{token, rest} => Success([ltok].concat(token), rest),
+				f @ Failure => f
+			}
+		case f @ Failure:
+			return f;
+	}
+});
