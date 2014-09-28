@@ -1,3 +1,5 @@
+var curry = require('curry');
+
 union Result {
 	Success { token: *, rest: * },
 	Failure { message: String }
@@ -18,7 +20,7 @@ var Token = {
 				}
 			},
 			expected: function(got) {
-				return "Expected '"+this.tok+"', got '"+got.slice(0, this.tok.length)+"'";
+				return "Expected '"+this.tok+"' got '"+got.slice(0, this.tok.length)+"'";
 			},
 			rest: function(str, m) {
 				return str.slice(this.tok.length);
@@ -39,7 +41,7 @@ var Token = {
 	}
 };
 
-exports.keyword = function(key, str) {
+exports.keyword = curry(function(key, str) {
 	var tok = Token.create(key);
 	var m = tok.match(str);
 	if(m) {
@@ -47,4 +49,5 @@ exports.keyword = function(key, str) {
 	}
 
 	return Failure(tok.expected(str));
-};
+});
+
