@@ -70,3 +70,10 @@ exports.dis = curry(function(l, r, str) {
 		Failure => r(str);
 	};
 });
+
+exports.map = curry(function(f, p, str) {
+	return match p(str) {
+		Success{token, rest} => Success(f(token), rest),
+		r @ Failure => r
+	};
+});
