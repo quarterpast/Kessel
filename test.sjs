@@ -27,41 +27,82 @@ let it = macro {
 }
 
 describe "keyword" {
-	describe "matching" {
-		it "should match exact matches" {
-			expect(kessel.keyword("a","a")).to.be.a(Success);
+	describe "string" {
+		describe "matching" {
+			it "should match exact matches" {
+				expect(kessel.keyword("a","a")).to.be.a(Success);
+			}
+			it "should save match as token" {
+				expect(kessel.keyword("a","a")).to.have.property("token", "a");
+			}
+			it "should match prefix match" {
+				expect(kessel.keyword("a","abc")).to.be.a(Success);
+			}
+			it "should save prefix match as token" {
+				expect(kessel.keyword("a","abc")).to.have.property("token", "a");
+			}
+			it "should save prefix remainder as rest" {
+				expect(kessel.keyword("a","abc")).to.have.property("rest", "bc");
+			}
 		}
-		it "should save match as token" {
-			expect(kessel.keyword("a","a")).to.have.property("token", "a");
-		}
-		it "should match prefix match" {
-			expect(kessel.keyword("a","abc")).to.be.a(Success);
-		}
-		it "should save prefix match as token" {
-			expect(kessel.keyword("a","abc")).to.have.property("token", "a");
-		}
-		it "should save prefix remainder as rest" {
-			expect(kessel.keyword("a","abc")).to.have.property("rest", "bc");
+
+		describe "not matching" {
+			it "doesn't match something completely different" {
+				expect(kessel.keyword("a", "b")).to.be.a(Failure);
+			}
+
+			it "gives an expected message" {
+				expect(kessel.keyword("a", "b")).to.have.property("message", "Expected 'a' got 'b'");
+			}
+
+			it "doesn't match an incomplete match" {
+				expect(kessel.keyword("asdf", "a")).to.be.a(Failure);
+			}
+
+			it "gives an expected message for incomplete match" {
+				expect(kessel.keyword("asdf", "a")).to.have.property("message", "Expected 'asdf' got 'a'");
+			}
 		}
 	}
 
-	describe "not matching" {
-		it "doesn't match something completely different" {
-			expect(kessel.keyword("a", "b")).to.be.a(Failure);
+	describe "regex" {
+		describe "matching" {
+			it "should match exact matches" {
+				expect(kessel.keyword(/a/,"a")).to.be.a(Success);
+			}
+			it "should save match as token" {
+				expect(kessel.keyword(/a/,"a")).to.have.property("token", "a");
+			}
+			it "should match prefix match" {
+				expect(kessel.keyword(/a/,"abc")).to.be.a(Success);
+			}
+			it "should save prefix match as token" {
+				expect(kessel.keyword(/a/,"abc")).to.have.property("token", "a");
+			}
+			it "should save prefix remainder as rest" {
+				expect(kessel.keyword(/a/,"abc")).to.have.property("rest", "bc");
+			}
 		}
 
-		it "gives an expected message" {
-			expect(kessel.keyword("a", "b")).to.have.property("message", "Expected 'a' got 'b'");
-		}
+		describe "not matching" {
+			it "doesn't match something completely different" {
+				expect(kessel.keyword(/a/, "b")).to.be.a(Failure);
+			}
 
-		it "doesn't match an incomplete match" {
-			expect(kessel.keyword("asdf", "a")).to.be.a(Failure);
-		}
+			it "gives an expected message" {
+				expect(kessel.keyword(/a/, "b")).to.have.property("message", "Expected '/a/' got 'b'");
+			}
 
-		it "gives an expected message for incomplete match" {
-			expect(kessel.keyword("asdf", "a")).to.have.property("message", "Expected 'asdf' got 'a'");
+			it "doesn't match an incomplete match" {
+				expect(kessel.keyword(/asdf/, "a")).to.be.a(Failure);
+			}
+
+			it "gives an expected message for incomplete match" {
+				expect(kessel.keyword(/asdf/, "a")).to.have.property("message", "Expected '/asdf/' got 'a'");
+			}
 		}
 	}
+
 }
 
 describe "seq" {
