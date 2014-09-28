@@ -1,14 +1,15 @@
 export SHELL := /bin/bash
 export PATH  := $(shell npm bin):$(PATH)
 
+SJS_OPTS = -m sparkler/macros -m adt-simple/macros -m lambda-chop/macros
+
 all: run
 
-lib/%.js: src/%.ls
-	mkdir -p lib
-	lsc -o lib -c $<
+lib/%.js: src/%.sjs
+	sjs $(SJS_OPTS) $< > $@
 
-%.js: %.sjs macros/index.js
-	sjs -m ./macros $< > $@
+test.js: test.sjs macros/index.js
+	sjs $(SJS_OPTS) -m ./macros $< > $@
 
 run: lib/index.js t.js
 	node t.js
