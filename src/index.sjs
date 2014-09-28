@@ -3,6 +3,9 @@ union Result {
 	Failure { message: String }
 } deriving require('adt-simple').Base
 
+exports.Success = Success;
+exports.Failure = Failure;
+
 var Token = {
 	tokens: {
 		StringToken: {
