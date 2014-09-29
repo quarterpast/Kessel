@@ -7,12 +7,14 @@ union Result {
 
 data Input {
 	index: Number,
-	content: String
+	content: String,
+	memotable: Object,
+	counts: Object
 } deriving require('adt-simple').Base;
 
 function toInput {
 	i @ Input  => i,
-	s @ String => Input(0, s)
+	s @ String => Input(0, s, {}, {})
 }
 
 exports.Success = Success;
@@ -25,16 +27,21 @@ var Token = {
 				String => true,
 				* => false
 			},
-			match: function(str) {
-				if(this.tok === str.slice(0, this.tok.length)) {
+			match: function(input) {
+				if(this.tok === input.content.slice(0, this.tok.length)) {
 					return this.tok;
 				}
 			},
 			expected: function(got) {
 				return "Expected '"+this.tok+"' got '"+got.slice(0, this.tok.length)+"'";
 			},
-			rest: function(str, m) {
-				return str.slice(this.tok.length);
+			rest: function(input, m) {
+				return Input(
+					input.index + m.length,
+					input.content.slice(m.length),
+					input.memotable,
+					input.counts
+				);
 			}
 		},
 		RegexToken: {
@@ -42,8 +49,8 @@ var Token = {
 				RegExp => true,
 				* => false
 			},
-			match: function(str) {
-				var m = this.tok.exec(str);
+			match: function(input) {
+				var m = this.tok.exec(input.content);
 				if(m) {
 					return m[1] || m[0];
 				}
@@ -51,8 +58,13 @@ var Token = {
 			expected: function(got) {
 				return "Expected '"+this.tok+"' got '"+got+"'";
 			},
-			rest: function(str, m) {
-				return str.slice(m.length);
+			rest: function(input, m) {
+				return Input(
+					input.index + m.length,
+					input.content.slice(m.length),
+					input.memotable,
+					input.counts
+				);
 			}
 		},
 	},
@@ -70,37 +82,37 @@ var Token = {
 	}
 };
 
-var memotable = {};
-var counts = {};
-
 exports.memo = curry(function(label, parser, input) {
 	input = toInput(input);
-	if(memotable[label] && memotable[label][input.index]) {
+
+	if(input.memotable[label] && input.memotable[label][input.index]) {
 		return memotable[label][input.index];
 	}
 
-	if(!counts[label]) counts[label] = {};
-	if(counts[label][input.index] > input.content.length + 1) {
+	if(!input.counts[label]) input.counts[label] = {};
+	if(input.counts[label][input.index] > input.content.length + 1) {
 		return Failure('Too much recursion');
 	}
 
-	if(!memotable[label]) memotable[label] = {};
-	counts[label][input.index] = (counts[label][input.index] || 0) + 1;
-	return memotable[label][input.index] = parser()(input.content);
+	if(!input.memotable[label]) input.memotable[label] = {};
+	input.counts[label][input.index] = (input.counts[label][input.index] || 0) + 1;
+	return input.memotable[label][input.index] = parser()(input);
 });
 
-exports.keyword = curry(function(key, str) {
+exports.keyword = curry(function(key, input) {
 	var tok = Token.create(key);
-	var m = tok.match(str);
+	input = toInput(input);
+	var m = tok.match(input);
 	if(m) {
-		return Success(m, tok.rest(str, m));
+		return Success(m, tok.rest(input, m));
 	}
 
-	return Failure(tok.expected(str));
+	return Failure(tok.expected(input.content));
 });
 
-exports.seq = curry(function(l, r, str) {
-	match l()(str) {
+exports.seq = curry(function(l, r, input) {
+	input = toInput(input);
+	match l()(input) {
 		case Success{token, rest}: 
 			var ltok = token;
 			return match r()(rest) {
@@ -112,20 +124,25 @@ exports.seq = curry(function(l, r, str) {
 	}
 });
 
-exports.dis = curry(function(l, r, str) {
-	return match l(str) {
+exports.dis = curry(function(l, r, input) {
+	input = toInput(input);
+	return match l(input) {
 		s @ Success => s,
-		Failure => r(str);
+		Failure => r(input);
 	};
 });
 
-exports.map = curry(function(f, p, str) {
-	return match p(str) {
+exports.map = curry(function(f, p, input) {
+	input = toInput(input);
+
+	return match p(input) {
 		Success{token, rest} => Success(f(token), rest),
 		r @ Failure => r
 	};
 });
 
-exports.empty = function(str) {
-	return Success([], str);
-}
+exports.empty = function(input) {
+	input = toInput(input);
+
+	return Success([], input);
+};

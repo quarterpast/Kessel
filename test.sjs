@@ -42,7 +42,7 @@ describe "keyword" {
 				expect(kessel.keyword("a","abc")).to.have.property("token", "a");
 			}
 			it "should save prefix remainder as rest" {
-				expect(kessel.keyword("a","abc")).to.have.property("rest", "bc");
+				expect(kessel.keyword("a","abc").rest).to.have.property("content", "bc");
 			}
 		}
 
@@ -80,7 +80,7 @@ describe "keyword" {
 				expect(kessel.keyword(/a/,"abc")).to.have.property("token", "a");
 			}
 			it "should save prefix remainder as rest" {
-				expect(kessel.keyword(/a/,"abc")).to.have.property("rest", "bc");
+				expect(kessel.keyword(/a/,"abc").rest).to.have.property("content", "bc");
 			}
 		}
 
@@ -118,7 +118,7 @@ describe "seq" {
 		it "should match left on arg of seq" {
 			var l = ("a")=!> Success("a", "");
 			expect(kessel.seq(=> l, => => Success("",""))("a")).to.be.a(Success);
-			expect(l).was.calledWith("a");
+			expect(l.lastCall.args[0]).to.have.property("content","a");
 		}
 
 		it "should match right on rest of left" {
@@ -249,11 +249,13 @@ describe "map" {
 	}
 }
 
+//TODO: how to fail when there's string left to consume?
 describe "the whole thing" {
 	it "should support left-recursive grammars" {
 		var b = kessel.memo('b', kessel.seq(=> a, => kessel.keyword("a")));
 		var a = kessel.memo('a', kessel.dis(b, kessel.empty));
 		expect(a("a")).to.be.a(Success);
+		expect(a("a").token).to.eql(["a"]);
 	}
 }
 
