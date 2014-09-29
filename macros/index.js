@@ -8,7 +8,6 @@ macro (=>) {
 
 macro (%) {
 	rule { $k:lit } => { $kessel.keyword($k) }
-	rule { $k }     => { $kessel.regex($k)   }
 }
 export (%);
 

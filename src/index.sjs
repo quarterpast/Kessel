@@ -14,7 +14,8 @@ data Input {
 
 function toInput {
 	i @ Input  => i,
-	s @ String => Input(0, s, {}, {})
+	s @ String => Input(0, s, {}, {}),
+	x => {throw new Error('no match: '+x);}
 }
 
 exports.Success = Success;
@@ -86,7 +87,7 @@ exports.memo = curry(function(label, parser, input) {
 	input = toInput(input);
 
 	if(input.memotable[label] && input.memotable[label][input.index]) {
-		return memotable[label][input.index];
+		return input.memotable[label][input.index];
 	}
 
 	if(!input.counts[label]) input.counts[label] = {};

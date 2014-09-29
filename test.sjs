@@ -250,12 +250,25 @@ describe "map" {
 }
 
 //TODO: how to fail when there's string left to consume?
+//TODO: if dis is failing the entire branch how can we ever reach the keyword?
 describe "the whole thing" {
 	it "should support left-recursive grammars" {
+		// a ::= a "a" | ε
 		var b = kessel.memo('b', kessel.seq(=> a, => kessel.keyword("a")));
 		var a = kessel.memo('a', kessel.dis(b, kessel.empty));
 		expect(a("a")).to.be.a(Success);
-		expect(a("a").token).to.eql(["a"]);
+		expect(a("a").token).to.eql("a");
+		expect(a("aaa").token).to.eql(["a","a","a"]);
+	}
+
+	it "should match a left-recursive expr grammar" {
+		// expr ::= expr "+" expr | [0-9]
+		var plus = kessel.keyword('+');
+		var term = kessel.keyword(/^\d+/);
+		var addX = kessel.memo('addX', kessel.seq(=> kessel.seq(=> expr, => plus), => expr));
+		var expr = kessel.memo('expr', kessel.dis(addX, term));
+		expect(expr('1+2')).to.be.a(Success);
+		expect(expr('1+2').token).to.eql([['1'],['2']])
 	}
 }
 

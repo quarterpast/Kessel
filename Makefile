@@ -8,7 +8,7 @@ all: run
 lib/%.js: src/%.sjs
 	sjs $(SJS_OPTS) $< > $@
 
-test.js: test.sjs macros/index.js
+%.js: %.sjs macros/index.js
 	sjs $(SJS_OPTS) -m ./macros $< > $@
 
 run: lib/index.js t.js
