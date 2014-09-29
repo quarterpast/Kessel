@@ -251,7 +251,8 @@ describe "map" {
 
 describe "the whole thing" {
 	it "should support left-recursive grammars" {
-		var a = kessel.dis(kessel.seq(=> a, => kessel.keyword("a")), kessel.empty);
+		var b = kessel.memo('b', kessel.seq(=> a, => kessel.keyword("a")));
+		var a = kessel.memo('a', kessel.dis(b, kessel.empty));
 		expect(a("a")).to.be.a(Success);
 	}
 }

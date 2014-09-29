@@ -3,7 +3,17 @@ var curry = require('curry');
 union Result {
 	Success { token: *, rest: * },
 	Failure { message: String }
-} deriving require('adt-simple').Base
+} deriving require('adt-simple').Base;
+
+data Input {
+	index: Number,
+	content: String
+} deriving require('adt-simple').Base;
+
+function toInput {
+	i @ Input  => i,
+	s @ String => Input(0, s)
+}
 
 exports.Success = Success;
 exports.Failure = Failure;
@@ -60,6 +70,25 @@ var Token = {
 	}
 };
 
+var memotable = {};
+var counts = {};
+
+exports.memo = curry(function(label, parser, input) {
+	input = toInput(input);
+	if(memotable[label] && memotable[label][input.index]) {
+		return memotable[label][input.index];
+	}
+
+	if(!counts[label]) counts[label] = {};
+	if(counts[label][input.index] > input.content.length + 1) {
+		return Failure('Too much recursion');
+	}
+
+	if(!memotable[label]) memotable[label] = {};
+	counts[label][input.index] = (counts[label][input.index] || 0) + 1;
+	return memotable[label][input.index] = parser()(input.content);
+});
+
 exports.keyword = curry(function(key, str) {
 	var tok = Token.create(key);
 	var m = tok.match(str);
@@ -96,3 +125,7 @@ exports.map = curry(function(f, p, str) {
 		r @ Failure => r
 	};
 });
+
+exports.empty = function(str) {
+	return Success([], str);
+}
